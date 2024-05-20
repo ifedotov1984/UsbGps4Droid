@@ -95,27 +95,35 @@ public class USBGpsProviderService extends Service implements USBGpsManager.Nmea
 
     private NotificationManager notificationManager;
     private static Boolean started = false;
+    private static Boolean serviceStarted = false;
+    private static Integer startedTries = 10;
     public static class BootReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             SharedPreferences sharedPreferences =
                     android.preference.PreferenceManager.getDefaultSharedPreferences(context);
-
-            if ((Objects.equals(intent.getAction(), Intent.ACTION_BOOT_COMPLETED) || Objects.equals(intent.getAction(), Intent.ACTION_LOCKED_BOOT_COMPLETED)) &&
-                    sharedPreferences.getBoolean(PREF_START_ON_BOOT, false) && !started) {
+            if (sharedPreferences.getBoolean(PREF_START_ON_BOOT, false) && !started) {
                 started = true;
-                new Handler(context.getMainLooper()).postDelayed(new Runnable() {
+
+                Handler mHandler = new Handler(context.getMainLooper());
+
+                Runnable mRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        if(appContext != null) {
-                            appContext.startService(
-                                    new Intent(appContext, USBGpsProviderService.class)
-                                            .setAction(ACTION_START_GPS_PROVIDER)
-                            );
+                            if(!serviceStarted) {
+                                context.startForegroundService(
+                                        new Intent(context, USBGpsProviderService.class)
+                                                .setAction(ACTION_START_GPS_PROVIDER)
+                                );
+                                if(startedTries-- >= 0) {
+                                    mHandler.postDelayed(this, 10000);
+                                }
                         }
                     }
-                }, 2000);
+                };
+
+                mHandler.postDelayed(mRunnable, 2000);
             }
         }
     }
@@ -206,8 +214,8 @@ public class USBGpsProviderService extends Service implements USBGpsManager.Nmea
                             .build();
 
                     startForeground(R.string.foreground_gps_provider_started_notification, notification);
-
                     showToast(R.string.msg_gps_provider_started);
+                    serviceStarted = true;
 
                 } else {
                     stopSelf();
