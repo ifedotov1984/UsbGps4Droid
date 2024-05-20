@@ -757,16 +757,14 @@ public class USBGpsManager {
 
         String channel ="";
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.createNotificationChannel(
-                    new NotificationChannel(
-                            NOTIFICATION_CHANNEL_ID,
-                            appContext.getString(R.string.app_name),
-                            NotificationManager.IMPORTANCE_LOW
-                    )
-            );
-            channel = NOTIFICATION_CHANNEL_ID;
-        }
+        notificationManager.createNotificationChannel(
+                new NotificationChannel(
+                        NOTIFICATION_CHANNEL_ID,
+                        appContext.getString(R.string.app_name),
+                        NotificationManager.IMPORTANCE_LOW
+                )
+        );
+        channel = NOTIFICATION_CHANNEL_ID;
 
         connectionProblemNotificationBuilder = new NotificationCompat.Builder(appContext, channel)
                 .setContentIntent(stopPendingIntent)

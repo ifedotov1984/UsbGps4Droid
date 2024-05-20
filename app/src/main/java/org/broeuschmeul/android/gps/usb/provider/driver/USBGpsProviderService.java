@@ -159,12 +159,13 @@ public class USBGpsProviderService extends Service implements USBGpsManager.Nmea
 
         if (ACTION_START_GPS_PROVIDER.equals(intent.getAction())) {
             if (gpsManager == null) {
+                gpsManager = new USBGpsManager(this, vendorId, productId, maxConRetries);
+
                 String mockProvider = LocationManager.GPS_PROVIDER;
                 if (!sharedPreferences.getBoolean(PREF_REPLACE_STD_GPS, true)) {
                     mockProvider = sharedPreferences.getString(PREF_MOCK_GPS_NAME, getString(R.string.defaultMockGpsName));
                 }
 
-                gpsManager = new USBGpsManager(this, vendorId, productId, maxConRetries);
                 boolean enabled = gpsManager.enable();
 
                 if (sharedPreferences.getBoolean(PREF_START_GPS_PROVIDER, false) != enabled) {
@@ -224,7 +225,7 @@ public class USBGpsProviderService extends Service implements USBGpsManager.Nmea
             } else {
                 // We received a start intent even though it's already running so restart
                 stopSelf();
-                startService(new Intent(this, USBGpsProviderService.class)
+                startForegroundService(new Intent(this, USBGpsProviderService.class)
                         .setAction(intent.getAction()));
             }
         } else if (ACTION_STOP_GPS_PROVIDER.equals(intent.getAction())) {

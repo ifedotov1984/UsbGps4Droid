@@ -216,7 +216,7 @@ public abstract class USBGpsBaseActivity extends AppCompatActivity implements
 
                     Intent serviceIntent = new Intent(this, USBGpsProviderService.class);
                     serviceIntent.setAction(USBGpsProviderService.ACTION_START_GPS_PROVIDER);
-                    startService(serviceIntent);
+                    startForegroundService(serviceIntent);
                 }
 
             } else {

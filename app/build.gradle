@@ -4,7 +4,7 @@ android {
     compileSdk 28
     defaultConfig {
         applicationId "org.broeuschmeul.android.gps.usb.provider"
-        minSdkVersion 24
+        minSdkVersion 26
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
 
